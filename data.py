@@ -60,9 +60,24 @@ class Database:
             parent_id = 'NULL'
 
         query = f"INSERT INTO taxonomy (name, level, parent_id) VALUES ('{name}', {level}, {parent_id});"
-        print(query)
         self.cur.execute(query)
         self.con.commit()
+
+    def get_id(
+            self,
+            name: str,
+            level: int,
+    ) -> int:
+        """Get the ID for a given name, level."""
+        query = f"SELECT id FROM taxonomy WHERE name == '{name}' AND level == '{level}';"
+        self.cur.execute(query)
+        rows = self.cur.fetchall()
+
+        # Confirm only one ID returned
+        assert len(rows) == 1
+        assert len(rows[0]) == 1
+        tax_id = rows[0][0]
+        return tax_id
 
     def insert_species(
             self,
@@ -85,9 +100,10 @@ class Database:
             if level != 0:
                 self._recur_insert_species(species=species, level=level-1)
 
+            # Get Parent ID
             # Insert this position.
 
-
+        # Return ID
 
 if __name__ == '__main__':
     db = Database()

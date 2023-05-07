@@ -22,6 +22,19 @@ class TestDatabase(unittest.TestCase):
         rows = db.cur.fetchall()
         assert rows == [(1, 'test', 0, None)]
 
+    def test_get_id(self):
+        db = Database()
+        db.make_db()
+        db.insert_taxonomy(
+            name='test',
+            level=0,
+        )
+        id = db.get_id(
+            name='test',
+            level=0,
+        )
+        assert isinstance(id, int)
+
     def test_insert_species(self):
 
         db = Database()
