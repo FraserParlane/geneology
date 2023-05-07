@@ -96,14 +96,25 @@ class Database:
         name = species.taxonomy[level]
         if not self._does_taxonomy_exist(name=name, level=level):
 
-            # Call this function for the parent taxonomy level
+            # Call this function recursively for the parent taxonomy level.
+            parent_id = 'NULL'
             if level != 0:
-                self._recur_insert_species(species=species, level=level-1)
+                parent_level = level - 1
+                self._recur_insert_species(species=species, level=parent_level)
 
-            # Get Parent ID
+                # Get Parent ID
+                parent_id = self.get_id(
+                    name=species.taxonomy[parent_level],
+                    level=parent_level,
+                )
+
             # Insert this position.
+            self.insert_taxonomy(
+                name=name,
+                level=level,
+                parent_id=parent_id,
+            )
 
-        # Return ID
 
 if __name__ == '__main__':
     db = Database()

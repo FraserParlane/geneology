@@ -51,6 +51,9 @@ class TestDatabase(unittest.TestCase):
             ]
         )
         db.insert_species(species=species)
+        db.cur.execute('SELECT id, name, level, parent_id FROM taxonomy;')
+        rows = db.cur.fetchall()
+        print('a')
 
 
 if __name__ == '__main__':
