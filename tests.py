@@ -5,6 +5,30 @@ import unittest
 
 class TestDatabase(unittest.TestCase):
 
+    species_a = Species(
+        taxonomy=[
+            'Animalia',
+            'Echinodermata',
+            'Asteroidea',
+            'Valvatida',
+            'Asterinidae',
+            'Patiria',
+            'P. miniata',
+        ]
+    )
+
+    species_b = Species(
+        taxonomy=[
+            'Animalia',
+            'Echinodermata',
+            'Asteroidea',
+            'Forcipulatida',
+            'Asteriidae',
+            'Leptasterias',
+            'L. polaris',
+        ]
+    )
+
     def test_database_creation(self):
 
         db = Database()
@@ -29,41 +53,18 @@ class TestDatabase(unittest.TestCase):
             name='test',
             level=0,
         )
-        id = db.get_id(
+        tax_id = db.get_id(
             name='test',
             level=0,
         )
-        assert isinstance(id, int)
+        assert isinstance(tax_id, int)
 
     def test_insert_species(self):
 
         db = Database()
         db.make_db()
-        species_a = Species(
-            taxonomy=[
-                'Animalia',
-                'Echinodermata',
-                'Asteroidea',
-                'Valvatida',
-                'Asterinidae',
-                'Patiria',
-                'P. miniata',
-            ]
-        )
-
-        species_b = Species(
-            taxonomy=[
-                'Animalia',
-                'Echinodermata',
-                'Asteroidea',
-                'Forcipulatida',
-                'Asteriidae',
-                'Leptasterias',
-                'L. polaris',
-            ]
-        )
-        db.insert_species(species=species_a)
-        db.insert_species(species=species_b)
+        db.insert_species(species=self.species_a)
+        db.insert_species(species=self.species_b)
         db.cur.execute('SELECT id, name, level, parent_id FROM taxonomy;')
         rows = db.cur.fetchall()
         assert len(rows) == 11
@@ -71,20 +72,17 @@ class TestDatabase(unittest.TestCase):
     def test_get_parent_ids(self):
         db = Database()
         db.make_db()
-        species = Species(
-            taxonomy=[
-                'Animalia',
-                'Echinodermata',
-                'Asteroidea',
-                'Valvatida',
-                'Asterinidae',
-                'Patiria',
-                'P. miniata',
-            ]
-        )
-        db.insert_species(species=species)
+        db.insert_species(species=self.species_a)
         ids = db.get_parent_ids(tax_id=5)
         assert len(ids) == 5
+
+    def test_database_to_dataframe(self):
+        db = Database()
+        db.make_db()
+        db.insert_species(species=self.species_a)
+        db.insert_species(species=self.species_b)
+        df = db.get_df()
+        assert len(df) == 11
 
 
 if __name__ == '__main__':

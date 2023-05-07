@@ -1,9 +1,8 @@
 """Helper functions for db communication"""
 from dataclasses import dataclass
 from typing import List, Optional
-import numpy as np
+import pandas as pd
 import sqlite3
-
 
 
 @dataclass
@@ -13,6 +12,7 @@ class Species:
 
     def __post_init__(self):
         assert len(self.taxonomy) == 7
+
 
 class Database:
     """A helper class for db communication."""
@@ -141,6 +141,13 @@ class Database:
         # Order such that the greatest ancestor is first.
         ids = ids[::-1]
         return ids
+
+    def get_df(self):
+        """Return the database as a dataframe."""
+        query = 'SELECT * FROM taxonomy;'
+        df = pd.read_sql_query(query, self.con)
+        df['parent_id'] = df['parent_id'].astype('Int64')
+        return df
 
 
 if __name__ == '__main__':
