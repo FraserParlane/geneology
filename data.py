@@ -12,6 +12,7 @@ class Species:
 
     def __post_init__(self):
         assert len(self.taxonomy) == 7
+        assert all(isinstance(i, str) for i in self.taxonomy)
 
 
 class Database:
@@ -151,5 +152,4 @@ class Database:
 
 
 if __name__ == '__main__':
-    db = Database()
-    db.make_db()
+    pass
