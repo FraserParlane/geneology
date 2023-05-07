@@ -91,6 +91,7 @@ class Database:
             species: Species,
             level: int = 6,
     ) -> None:
+        """Recursively insert species taxonomy into the database, as needed."""
 
         # If this position doesn't exist
         name = species.taxonomy[level]
@@ -114,6 +115,32 @@ class Database:
                 level=level,
                 parent_id=parent_id,
             )
+
+    def get_parent_ids(
+            self,
+            tax_id: int,
+    ) -> List[int]:
+        """For a given ID, get all parent IDs."""
+
+        ids = [tax_id]
+        while True:
+
+            # Get parent ID
+            query = f"SELECT parent_id FROM taxonomy WHERE id == '{tax_id}';"
+            self.cur.execute(query)
+            row = self.cur.fetchone()
+            tax_id = row[0]
+
+            # If no parent ID, break loop
+            if tax_id is None:
+                break
+
+            # Store parent ID
+            ids.append(tax_id)
+
+        # Order such that the greatest ancestor is first.
+        ids = ids[::-1]
+        return ids
 
 
 if __name__ == '__main__':
