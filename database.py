@@ -5,7 +5,8 @@ import os
 
 class Database:
     """A helper class for db communication."""
-    db_name = 'database.sqlite'
+    db_name = 'database.db'
+    sql_name = 'database.sql'
     con = None
     cur = None
     connected = False
@@ -15,23 +16,20 @@ class Database:
 
     def connect(self):
         """Connect to the database."""
-
-        # If already connected, stop.
-        if self.connected:
-            return
-
-        # If database does not exist, create it.
-        if not os.path.exists(self.db_name):
-            self.make_db()
-
-        # Connect
-        self.con = sqlite3.connect(self.db_name)
-        self.cur = self.con.cursor()
-        self.connected = True
+        if not self.connected:
+            self.con = sqlite3.connect(self.db_name)
+            self.cur = self.con.cursor()
+            self.connected = True
 
     def make_db(self):
         """Create a blank database."""
-        ...
+        self.connect()
+        with open(self.sql_name, 'r') as f:
+            sql_script = f.read()
+        self.cur.executescript(sql_script)
+        self.con.commit()
+
 
 if __name__ == '__main__':
-    pass
+    db = Database()
+    db.make_db()
